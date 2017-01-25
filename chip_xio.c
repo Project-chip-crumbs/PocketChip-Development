@@ -1,5 +1,5 @@
 /*--------------------------------------------------------------------------------------------
-// Name: chip_xio
+// Name: chip_xio.c
 //
 // Synopsis: chip_xio is a basic application to drive the xio port on the C.H.I.P.  Layered on
 //           the existing sysfs implementation for NON-RTA pin driving.
@@ -27,20 +27,11 @@
 #include <fcntl.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include "chip_xio.h"
 
 #define BUFFS    3
-
 // This will change based on kernal 
 // version.  See note above.
-#define BASE     1013
-#define XIO_P0   BASE
-#define XIO_P1   BASE+1
-#define XIO_P2   BASE+2
-#define XIO_P3   BASE+3
-#define XIO_P4   BASE+4
-#define XIO_P5   BASE+5
-#define XIO_P6   BASE+6
-#define XIO_P7   BASE+7
 #define ADDRESS_SIZE 4
 
 // Future port access
@@ -183,6 +174,7 @@ void set_pin_low( int pin )
      sprintf( str, "%s%d%s", front, pin, back );
      system( str );
 }
+/*
 // Test program
 void main( void )
 {
@@ -260,3 +252,4 @@ void main( void )
      printf( "Unexport pin XIO_P0\n" );
      unexport_pin( XIO_P0 );
 }
+*/
