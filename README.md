@@ -17,6 +17,7 @@
 To compile it (if you use GCC):
 
 $ gcc -c chip_xio.c -o chip_xio.o
+
 $ gcc -c test_chip_xio.c -o test_chip_xio.o
 
 To link the files to create an executable file:
