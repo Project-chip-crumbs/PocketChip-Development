@@ -47,7 +47,7 @@ int check_export_pin( int pin )
      struct stat info;
      char* str = "/sys/class/gpio/gpio";
      unsigned int size;
-     size = (unsigned int)strlen( str );
+     size = strlen( str );
      size += ADDRESS_SIZE;
      char path[size];
      sprintf( path, "%s%d", str, pin );
@@ -64,8 +64,8 @@ int export_pin( int pin )
      char* front = "sh -c 'echo";
      char* back  = "> /sys/class/gpio/export'";
      unsigned int size;
-     size = (unsigned int)strlen( front );
-     size += (unsigned int)strlen( back );
+     size = strlen( front );
+     size += strlen( back );
      size += (ADDRESS_SIZE+2);
      char str[size];
      sprintf( str, "%s %d %s", front, pin, back );
@@ -77,8 +77,8 @@ int unexport_pin( int pin )
      char* front = "sh -c 'echo";
      char* back  = "> /sys/class/gpio/unexport'";
      unsigned int size;
-     size = (unsigned int)strlen( front );
-     size += (unsigned int)strlen( back );
+     size = strlen( front );
+     size += strlen( back );
      size += (ADDRESS_SIZE+2);
      char str[size];
      sprintf( str, "%s %d %s", front, pin, back );
@@ -90,8 +90,8 @@ void set_pin_output( int pin )
      char* front = "sh -c 'echo out > /sys/class/gpio/gpio";
      char* back  = "/direction'";
      unsigned int size;
-     size = (unsigned int)strlen( front );
-     size += (unsigned int)strlen( back );
+     size = strlen( front );
+     size += strlen( back );
      size += ADDRESS_SIZE;
      char str[size];
      sprintf( str, "%s%d%s", front, pin, back );
@@ -103,8 +103,8 @@ void set_pin_input( int pin )
      char* front = "sh -c 'echo in > /sys/class/gpio/gpio";
      char* back  = "/direction'";
      unsigned int size;
-     size = (unsigned int)strlen( front );
-     size += (unsigned int)strlen( back );
+     size = strlen( front );
+     size += strlen( back );
      size += ADDRESS_SIZE;
      char str[size];
      sprintf( str, "%s%d%s", front, pin, back );
@@ -117,8 +117,8 @@ char* get_pin_direction( int pin )
      char* front = "/sys/class/gpio/gpio";
      char* back  = "/direction";
      unsigned int size;
-     size = (unsigned int)strlen( front );
-     size += (unsigned int)strlen( back );
+     size = strlen( front );
+     size += strlen( back );
      size += ADDRESS_SIZE;
      char str[size];
      sprintf( str, "%s%d%s", front, pin, back );
@@ -136,8 +136,8 @@ char *get_pin_value( int pin )
      char* front = "/sys/class/gpio/gpio";
      char* back  = "/value";
      unsigned int size;
-     size = (unsigned int)strlen( front );
-     size += (unsigned int)strlen( back );
+     size = strlen( front );
+     size += strlen( back );
      size += ADDRESS_SIZE;
      char str[size];
      sprintf( str, "%s%d%s", front, pin, back );
@@ -155,8 +155,8 @@ void set_pin_high( int pin )
      char* front = "sh -c 'echo 1 > /sys/class/gpio/gpio";
      char* back  = "/value'";
      unsigned int size;
-     size = (unsigned int)strlen( front );
-     size += (unsigned int)strlen( back );
+     size = strlen( front );
+     size += strlen( back );
      size += ADDRESS_SIZE;
      char str[size];
      sprintf( str, "%s%d%s", front, pin, back );
@@ -168,8 +168,8 @@ void set_pin_low( int pin )
      char* front = "sh -c 'echo 0 > /sys/class/gpio/gpio";
      char* back  = "/value'";
      unsigned int size;
-     size = (unsigned int)strlen( front );
-     size += (unsigned int)strlen( back );
+     size = strlen( front );
+     size += strlen( back );
      size += ADDRESS_SIZE;
      char str[size];
      sprintf( str, "%s%d%s", front, pin, back );
