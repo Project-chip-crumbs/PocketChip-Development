@@ -35,14 +35,17 @@
 #define XIO_P6   BASE+6
 #define XIO_P7   BASE+7
 
+extern int   get_xio_pin_base  ( );
+extern int   is_xio_pin        ( int pin );
+extern int   check_export_dir  ( );
 extern int   check_export_pin  ( int pin );
 extern int   export_pin        ( int pin );
 extern int   unexport_pin      ( int pin );
 extern char* get_pin_direction ( int pin );
-extern void  set_pin_output    ( int pin );
-extern void  set_pin_input     ( int pin );
+extern int   set_pin_output    ( int pin );
+extern int   set_pin_input     ( int pin );
 extern char* get_pin_value     ( int pin );
-extern void  set_pin_high      ( int pin );
-extern void  set_pin_low       ( int pin );
+extern int   set_pin_high      ( int pin );
+extern int   set_pin_low       ( int pin );
 
 #endif

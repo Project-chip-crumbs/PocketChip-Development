@@ -53,14 +53,15 @@ char* tok[] = {
 		"/gpio",
 		"/export'",
 		"/unexport'",
-		"/value'",
-		"/direction'",
+		"/value",
+		"/direction",
 		"sh -c 'echo",
 		"out",
 		"in",
 		"1",
 		"0",
-		">" };
+		">",
+		"'" };
 
 // In house helper functions
 //-------------------------------------------------------------------------------------------------
@@ -75,26 +76,47 @@ unsigned int create_command( char* retstr, char* format, ... )
    va_end( a_list );
    return strlen( retstr );
 }
-
 // Functions included in header file.
 //----------------------------------------------------------------------------------------------------
+// Check for valid address.
+int is_xio_pin( int pin )
+{
+   int base_add;
+   for( base_add = BASE; base_add < (BASE+8); base_add++ )
+   {
+	if( pin == base_add )
+	   return 0;
+   }
+   printf("%d is not a valid XIO pin address\n");
+   return 1;
+}
+int get_xio_pin_base( )
+{
+
+}
 // Use to check for export directory.
 // Return '1' found directory.  Return '0' no directory.
 int check_export_dir( )
 {
      struct stat info;
      create_command( command, "%s%s%s", tok[0], tok[1], tok[2] );
-     if( stat( command, &info ) != 0 )
+     if( stat( command, &info ) != 0 ) {
         return 0;  // No DIR access
+        print("%s\n", command);
+     }
      else if( info.st_mode & S_IFDIR )  //Is a DIR
         return 1;
-     else
+     else {
         return 0;  //No DIR
+        print("%s\n", command );
+    }
 }
 // Use to check avalability of pin for export.
 // Return '1' found directory.  Return '0' no directory.
 int check_export_pin( int pin )
 {
+     if( is_xio_pin( pin ) )
+	return 0;
      struct stat info;
      create_command( command, "%s%s%s%s%d", tok[0], tok[1], tok[2], tok[2], pin );
      if(stat( command, &info ) != 0)
@@ -107,6 +129,8 @@ int check_export_pin( int pin )
 // Export a pin. On ERROR = -1.
 int export_pin( int pin )
 {
+     if( is_xio_pin( pin ) )
+	return 0;
      create_command( command, "%s %d %s %s%s%s%s", tok[7], pin, tok[12],
 	tok[0], tok[1], tok[2], tok[3] );
      return system( command );
@@ -114,29 +138,38 @@ int export_pin( int pin )
 // Unexport a pin. On ERROR = -1.
 int unexport_pin( int pin )
 {
+     if( is_xio_pin( pin ) )
+	return 0;
      create_command( command, "%s %d %s %s%s%s%s", tok[7], pin, tok[12],
 	tok[0], tok[1], tok[2], tok[4] );
      return system( command );
 }
 // Set the selected pin for output
-void set_pin_output( int pin )
+int set_pin_output( int pin )
 {
-     create_command( command, "%s %s %s %s%s%s%s%d%s", tok[7], tok[8],
-	tok[12], tok[0], tok[1], tok[2], tok[2], pin, tok[6] );
+     if( is_xio_pin( pin ) )
+	return 0;
+     create_command( command, "%s %s %s %s%s%s%s%d%s%s", tok[7], tok[8],
+	tok[12], tok[0], tok[1], tok[2], tok[2], pin, tok[6], tok[13] );
      system( command );
 }
 // Set the selected pin for input
-void set_pin_input( int pin )
+int set_pin_input( int pin )
 {
-     create_command( command, "%s %s %s %s%s%s%s%d%s", tok[7], tok[9],
-	tok[12], tok[0], tok[1], tok[2], tok[2], pin, tok[6] );
+     if( is_xio_pin( pin ) )
+	return 0;
+     create_command( command, "%s %s %s %s%s%s%s%d%s%s", tok[7], tok[9],
+	tok[12], tok[0], tok[1], tok[2], tok[2], pin, tok[6], tok[13] );
      system( command );
 }
 // Get the direction of the pin.  Input or output.
-// Returns "in" or "out" for result.  May change this
-// to int 1 or 0.  Need to see how annoying it gets.
+// Returns "in" or "out" for result.  Error "0"
+// pin Address is bad.
 char* get_pin_direction( int pin )
 {
+     if( is_xio_pin( pin ) )
+	return "0";
+
      int fd;
      create_command( command, "%s%s%s%s%d%s", tok[0], tok[1], tok[2],
 	tok[2], pin, tok[6] );
@@ -151,13 +184,15 @@ char* get_pin_direction( int pin )
      return &buff[0];
 }
 // Get the current value of the pin.
-// Returns "1" or "0" for result.  May change this
-// to int 1 or 0.  Need to see how annoying it gets.
+// Returns "1" or "0" for result.  Error "0"
+// pin address is bad.
 char *get_pin_value( int pin )
 {
+     if( is_xio_pin( pin ) )
+	return "0";
      int fd;
      create_command( command, "%s%s%s%s%d%s", tok[0], tok[1], tok[2],
-	tok[3], pin, tok[5] );
+	tok[2], pin, tok[5] );
      if(( fd = open( command, O_RDONLY, 0 )) == -1 )
         error( "get_pin_value: can't open" );
 
@@ -167,16 +202,20 @@ char *get_pin_value( int pin )
      return &buff[0];
 }
 // Set the selected output pin high.
-void set_pin_high( int pin )
+int set_pin_high( int pin )
 {
-     create_command( command, "%s %s %s %s%s%s%s%d%s", tok[7], tok[10],
-	tok[12], tok[0], tok[1], tok[2], tok[2], pin, tok[5] );
+     if( is_xio_pin( pin ) )
+	return 0;
+     create_command( command, "%s %s %s %s%s%s%s%d%s%s", tok[7], tok[10],
+	tok[12], tok[0], tok[1], tok[2], tok[2], pin, tok[5], tok[13] );
      system( command );
 }
 // Set the selected output pin low.
-void set_pin_low( int pin )
+int set_pin_low( int pin )
 {
-     create_command( command, "%s %s %s %s%s%s%s%d%s", tok[7], tok[11],
-	tok[12], tok[0], tok[1], tok[2], tok[2] , pin, tok[5] );
+     if( is_xio_pin( pin ) )
+	return 0;
+     create_command( command, "%s %s %s %s%s%s%s%d%s%s", tok[7], tok[11],
+	tok[12], tok[0], tok[1], tok[2], tok[2] , pin, tok[5], tok[13] );
      system( command );
 }

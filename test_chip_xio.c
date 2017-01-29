@@ -29,7 +29,12 @@
 void main( void )
 {
      int count;
-
+     printf("Checking for export---------------------------------------------\n");
+     if( check_export_dir() == 0 )
+     {
+	printf("Export dir not found!\n");
+	return;
+     }
      if( check_export_pin( XIO_P0 ) == 1 )
      {
 	printf("Pin %d is in use!\n", XIO_P0);
@@ -40,6 +45,16 @@ void main( void )
 	printf("Pin %d is in use!\n", XIO_P1);
         return;
      }
+     else if( check_export_pin(XIO_P2) == 1)
+     {
+	printf("Pin %d is in use!\n", XIO_P2);
+        return;
+     }
+     else if( check_export_pin(XIO_P3) == 1)
+     {
+	printf("Pin %d is in use!\n", XIO_P3);
+        return;
+     }
      else
 	printf("Pins are not in use!\n");
 
@@ -47,13 +62,18 @@ void main( void )
      export_pin( XIO_P0 );
      printf( "export pin XIO_P1\n" );
      export_pin( XIO_P1 );
+     printf( "export pin XIO_P2\n" );
+     export_pin( XIO_P2 );
+     printf( "export pin XIO_P3\n" );
+     export_pin( XIO_P3 );
 
-
+     printf("Checking for direction------------------------------------------\n");
      printf( "XIO_P0 Pin Direction is: %s\n", get_pin_direction( XIO_P0 ));
      printf( "XIO_P1 Pin Direction is: %s\n", get_pin_direction( XIO_P1 ));
+     printf( "XIO_P2 Pin Direction is: %s\n", get_pin_direction( XIO_P2 ));
+     printf( "XIO_P3 Pin Direction is: %s\n", get_pin_direction( XIO_P3 ));
 
-     // strncmp is used because 
-     if( strncmp( get_pin_direction( XIO_P0 ), "in", 2 ) == 0 )
+     if( strcmp( get_pin_direction( XIO_P0 ), "in" ) == 0 )
      {
         printf( "Change input to output\n" );
 	set_pin_output( XIO_P0 );
@@ -63,7 +83,7 @@ void main( void )
         printf( "Pin set for output\n" );
      }
 
-     if( strncmp( get_pin_direction( XIO_P1 ), "in", 2 ) == 0 )
+     if( strcmp( get_pin_direction( XIO_P1 ), "in" ) == 0 )
      {
         printf( "Change input to output\n" );
 	set_pin_output( XIO_P1 );
@@ -72,33 +92,73 @@ void main( void )
      {
         printf( "Pin set for output\n" );
      }
-
-     for( count = 0; count < 10; count++ )
+     if( strcmp( get_pin_direction( XIO_P2 ), "in" ) == 0 )
+     {
+        printf( "Change input to output\n" );
+	set_pin_output( XIO_P2 );
+     }
+     else
+     {
+        printf( "Pin set for output\n" );
+     }
+     if( strcmp( get_pin_direction( XIO_P3 ), "in" ) == 0 )
+     {
+        printf( "Change input to output\n" );
+	set_pin_output( XIO_P3 );
+     }
+     else
+     {
+        printf( "Pin set for output\n" );
+     }
+     printf("Run test program------------------------------------------------\n");
+     for( count = 0; count < 5; count++ )
      {
         printf( "Setting XIO_P0 high\n");
         set_pin_high( XIO_P0 );
-        printf( "Setting XIO_P1 high\n");
-        set_pin_high( XIO_P1 );
+        printf( "Setting XIO_P1 low\n");
+        set_pin_low( XIO_P1 );
+        printf( "Setting XIO_P2 high\n");
+        set_pin_high( XIO_P2 );
+        printf( "Setting XIO_P3 low\n");
+        set_pin_low( XIO_P3 );
         printf( "XIO_P0 Pin Value is: %s\n", get_pin_value( XIO_P0 ) );
         printf( "XIO_P1 Pin Value is: %s\n", get_pin_value( XIO_P1 ) );
-        sleep( 5 );
+        printf( "XIO_P2 Pin Value is: %s\n", get_pin_value( XIO_P2 ) );
+        printf( "XIO_P3 Pin Value is: %s\n", get_pin_value( XIO_P3 ) );
+        sleep( 1 );
         printf("Setting XIO_P0 low\n");
         set_pin_low( XIO_P0 );
-        printf("Setting XIO_P1 low\n");
-        set_pin_low( XIO_P1 );
+        printf("Setting XIO_P1 high\n");
+        set_pin_high( XIO_P1 );
+        printf("Setting XIO_P2 low\n");
+        set_pin_low( XIO_P2 );
+        printf("Setting XIO_P3 high\n");
+        set_pin_high( XIO_P3 );
         printf( "XIO_P0 Pin Value is: %s\n", get_pin_value( XIO_P0 ) );
         printf( "XIO_P1 Pin Value is: %s\n", get_pin_value( XIO_P1 ) );
-        sleep( 5 );
+        printf( "XIO_P2 Pin Value is: %s\n", get_pin_value( XIO_P2 ) );
+        printf( "XIO_P3 Pin Value is: %s\n", get_pin_value( XIO_P3 ) );
+        sleep( 1 );
       }
 	printf( "Setting XIO_P0 high\n");
         set_pin_high( XIO_P0 );
 	printf( "Setting XIO_P1 high\n");
         set_pin_high( XIO_P1 );
+	printf( "Setting XIO_P2 high\n");
+        set_pin_high( XIO_P2 );
+	printf( "Setting XIO_P3 high\n");
+        set_pin_high( XIO_P3 );
         printf( "XIO_P0 Pin Value is: %s\n", get_pin_value( XIO_P0 ) );
         printf( "XIO_P1 Pin Value is: %s\n", get_pin_value( XIO_P1 ) );
-
-     printf( "Unexport pin XIO_P1\n" );
-     unexport_pin( XIO_P1 );
+        printf( "XIO_P2 Pin Value is: %s\n", get_pin_value( XIO_P2 ) );
+        printf( "XIO_P3 Pin Value is: %s\n", get_pin_value( XIO_P3 ) );
+     printf("Checking for unexport-----------------------------------------------\n");
      printf( "Unexport pin XIO_P0\n" );
      unexport_pin( XIO_P0 );
+     printf( "Unexport pin XIO_P1\n" );
+     unexport_pin( XIO_P1 );
+     printf( "Unexport pin XIO_P2\n" );
+     unexport_pin( XIO_P2 );
+     printf( "Unexport pin XIO_P3\n" );
+     unexport_pin( XIO_P3 );
 }
