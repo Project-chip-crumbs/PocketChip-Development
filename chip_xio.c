@@ -87,12 +87,13 @@ int is_xio_pin( int pin )
 	if( pin == base_add )
 	   return 0;
    }
-   printf("%d is not a valid XIO pin address\n");
+   printf("%d is not a valid XIO pin address\n",pin);
    return 1;
 }
+// Return base address
 int get_xio_pin_base( )
 {
-
+   return BASE;
 }
 // Use to check for export directory.
 // Return '1' found directory.  Return '0' no directory.

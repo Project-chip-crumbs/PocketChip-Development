@@ -28,6 +28,11 @@
 // Test program
 void main( void )
 {
+     if( geteuid() != 0 )
+     {
+	printf("Run as a sudo user!\n");
+	return;
+     }
      int count;
      printf("Checking for export---------------------------------------------\n");
      if( check_export_dir() == 0 )
