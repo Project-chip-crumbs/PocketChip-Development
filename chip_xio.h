@@ -35,6 +35,7 @@
 #define XIO_P6   BASE+6
 #define XIO_P7   BASE+7
 
+extern int   chip_xio_start    ( );
 extern int   get_xio_pin_base  ( );
 extern int   is_xio_pin        ( int pin );
 extern int   check_export_dir  ( );

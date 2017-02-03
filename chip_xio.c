@@ -21,7 +21,8 @@
 // Copyright (c) 2017 Ovide N. Mercure
 ---------------------------------------------------------------------------------------------*/
 // TODO: Error Handling.
-// TODO: Makefile.
+// TODO: MUTEX Lock for pins in use.  Create "lock" file when pin is exported.
+//	 locate file in pin export directory.  Release on unexport.
 // TODO: PORT Handling.
 //--------------------------------------------------------------------------------------------
 #include <stdio.h>
@@ -46,7 +47,7 @@
 //int xio_port_arr[] = { XIO_P0, XIO_P1, XIO_P2, XIO_P3, XIO_P4, XIO_P5, XIO_P6, XIO_P7 };
 
 char buff[BUFFS],command[COMMAND_BUFF_SIZE];
-//char* path;
+
 char* tok[] = {
 		"/sys",
 		"/class",
@@ -63,6 +64,8 @@ char* tok[] = {
 		">",
 		"'" };
 
+#define EXPORT_DIR tok[0], tok[1], tok[2]
+
 // In house helper functions
 //-------------------------------------------------------------------------------------------------
 // Create function which takes in all tokens and assembls them in that order
@@ -78,6 +81,21 @@ unsigned int create_command( char* retstr, char* format, ... )
 }
 // Functions included in header file.
 //----------------------------------------------------------------------------------------------------
+int chip_xio_start( void  )
+{
+   if( getuid() != 0 )
+   {
+      printf("Sudo user required!\n");
+      return -1;
+   }
+   if( check_export_dir() < 1 )
+   {
+      printf("Cannot access export dir: %s\n", command );
+      return -1;
+   }
+   return 1;
+}
+
 // Check for valid address.
 int is_xio_pin( int pin )
 {
@@ -85,10 +103,10 @@ int is_xio_pin( int pin )
    for( base_add = BASE; base_add < (BASE+8); base_add++ )
    {
 	if( pin == base_add )
-	   return 0;
+	   return 1;
    }
-   printf("%d is not a valid XIO pin address\n",pin);
-   return 1;
+   printf("%d is not a valid XIO pin address\n", pin);
+   return 0;
 }
 // Return base address
 int get_xio_pin_base( )
@@ -100,7 +118,7 @@ int get_xio_pin_base( )
 int check_export_dir( )
 {
      struct stat info;
-     create_command( command, "%s%s%s", tok[0], tok[1], tok[2] );
+     create_command( command, "%s%s%s", EXPORT_DIR );
      if( stat( command, &info ) != 0 ) {
         return 0;  // No DIR access
         print("%s\n", command);
@@ -116,10 +134,10 @@ int check_export_dir( )
 // Return '1' found directory.  Return '0' no directory.
 int check_export_pin( int pin )
 {
-     if( is_xio_pin( pin ) )
-	return 0;
+     if( !is_xio_pin( pin ) )
+	return -1;
      struct stat info;
-     create_command( command, "%s%s%s%s%d", tok[0], tok[1], tok[2], tok[2], pin );
+     create_command( command, "%s%s%s%s%d", EXPORT_DIR, tok[2], pin );
      if(stat( command, &info ) != 0)
         return 0;  // No DIR access
      else if(info.st_mode & S_IFDIR)  //Is a DIR
@@ -130,37 +148,44 @@ int check_export_pin( int pin )
 // Export a pin. On ERROR = -1.
 int export_pin( int pin )
 {
-     if( is_xio_pin( pin ) )
-	return 0;
+     int i;
+     i = check_export_pin( pin );
+     if( i == -1 )
+        return -1;
+     else if( i == 1)
+     {
+        printf("Pin %s already in use!\n", pin );
+	return -1;
+     }
      create_command( command, "%s %d %s %s%s%s%s", tok[7], pin, tok[12],
-	tok[0], tok[1], tok[2], tok[3] );
+	EXPORT_DIR, tok[3] );
      return system( command );
 }
 // Unexport a pin. On ERROR = -1.
 int unexport_pin( int pin )
 {
-     if( is_xio_pin( pin ) )
-	return 0;
+     if( !is_xio_pin( pin ) )
+	return -1;
      create_command( command, "%s %d %s %s%s%s%s", tok[7], pin, tok[12],
-	tok[0], tok[1], tok[2], tok[4] );
+	EXPORT_DIR, tok[4] );
      return system( command );
 }
 // Set the selected pin for output
 int set_pin_output( int pin )
 {
-     if( is_xio_pin( pin ) )
-	return 0;
+     if( !is_xio_pin( pin ) )
+	return -1;
      create_command( command, "%s %s %s %s%s%s%s%d%s%s", tok[7], tok[8],
-	tok[12], tok[0], tok[1], tok[2], tok[2], pin, tok[6], tok[13] );
+	tok[12], EXPORT_DIR, tok[2], pin, tok[6], tok[13] );
      system( command );
 }
 // Set the selected pin for input
 int set_pin_input( int pin )
 {
-     if( is_xio_pin( pin ) )
-	return 0;
+     if( !is_xio_pin( pin ) )
+	return -1;
      create_command( command, "%s %s %s %s%s%s%s%d%s%s", tok[7], tok[9],
-	tok[12], tok[0], tok[1], tok[2], tok[2], pin, tok[6], tok[13] );
+	tok[12], EXPORT_DIR, tok[2], pin, tok[6], tok[13] );
      system( command );
 }
 // Get the direction of the pin.  Input or output.
@@ -168,12 +193,10 @@ int set_pin_input( int pin )
 // pin Address is bad.
 char* get_pin_direction( int pin )
 {
-     if( is_xio_pin( pin ) )
-	return "0";
-
+     if( !is_xio_pin( pin ) )
+	return "-1";
      int fd;
-     create_command( command, "%s%s%s%s%d%s", tok[0], tok[1], tok[2],
-	tok[2], pin, tok[6] );
+     create_command( command, "%s%s%s%s%d%s", EXPORT_DIR, tok[2], pin, tok[6] );
      if(( fd = open( command, O_RDONLY, 0 )) == -1 )
         error( "get_pin_direction: can't open" );
 
@@ -189,11 +212,10 @@ char* get_pin_direction( int pin )
 // pin address is bad.
 char *get_pin_value( int pin )
 {
-     if( is_xio_pin( pin ) )
-	return "0";
+     if( !is_xio_pin( pin ) )
+	return "-1";
      int fd;
-     create_command( command, "%s%s%s%s%d%s", tok[0], tok[1], tok[2],
-	tok[2], pin, tok[5] );
+     create_command( command, "%s%s%s%s%d%s", EXPORT_DIR, tok[2], pin, tok[5] );
      if(( fd = open( command, O_RDONLY, 0 )) == -1 )
         error( "get_pin_value: can't open" );
 
@@ -205,18 +227,18 @@ char *get_pin_value( int pin )
 // Set the selected output pin high.
 int set_pin_high( int pin )
 {
-     if( is_xio_pin( pin ) )
-	return 0;
+     if( !is_xio_pin( pin ) )
+	return -1;
      create_command( command, "%s %s %s %s%s%s%s%d%s%s", tok[7], tok[10],
-	tok[12], tok[0], tok[1], tok[2], tok[2], pin, tok[5], tok[13] );
+	tok[12], EXPORT_DIR, tok[2], pin, tok[5], tok[13] );
      system( command );
 }
 // Set the selected output pin low.
 int set_pin_low( int pin )
 {
-     if( is_xio_pin( pin ) )
-	return 0;
+     if( !is_xio_pin( pin ) )
+	return -1;
      create_command( command, "%s %s %s %s%s%s%s%d%s%s", tok[7], tok[11],
-	tok[12], tok[0], tok[1], tok[2], tok[2] , pin, tok[5], tok[13] );
+	tok[12], EXPORT_DIR, tok[2] , pin, tok[5], tok[13] );
      system( command );
 }
