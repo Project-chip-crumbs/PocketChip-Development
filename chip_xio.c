@@ -21,8 +21,6 @@
 // Copyright (c) 2017 Ovide N. Mercure
 ---------------------------------------------------------------------------------------------*/
 // TODO: Error Handling.
-// TODO: MUTEX Lock for pins in use.  Create "lock" file when pin is exported.
-//	 locate file in pin export directory.  Release on unexport.
 // TODO: PORT Handling.
 //--------------------------------------------------------------------------------------------
 #include <stdio.h>
