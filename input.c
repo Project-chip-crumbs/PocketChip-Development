@@ -18,17 +18,15 @@ void main( void )
 		return;
 	}
 
-	if( check_export_pin( XIO_P4 ) < 1 )
+        if( export_pin( XIO_P4 ) == -1 )
+        {
+		printf("Export failed!\n");
+		return;
+        }
+	 else
 	{
-           if( export_pin( XIO_P4 ) == -1 )
-	   	printf("Export failed!\n");
-           else
-                printf("Pin exported!\n");
-	}
-	else
-	{
-	   printf("Pin already in use!\n");
-	   return;
+		printf("Somehow\n");
+		return;
 	}
 
 	if( get_pin_direction( XIO_P4 ) == "out" )
