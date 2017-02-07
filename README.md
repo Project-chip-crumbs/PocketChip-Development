@@ -16,12 +16,13 @@
 
 To compile it (if you use GCC):
 
-make test_chip_xio
+make all
 
 You can test sample:
 
+Drive Relays on xio pins for output.
 $ sudo ./test_chip_xio
-
-To clean obj files:
-
-make clean
+Tested rain sensor on input.
+$ sudo ./test_input
+Tested single led on output.
+$ sudo ./test_blink
