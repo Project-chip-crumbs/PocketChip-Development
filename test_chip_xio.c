@@ -28,49 +28,25 @@
 // Test program
 void main( void )
 {
-     if( geteuid() != 0 )
-     {
-	printf("Run as a sudo user!\n");
-	return;
-     }
      int count;
-     printf("Checking for export---------------------------------------------\n");
-     if( check_export_dir() == 0 )
-     {
-	printf("Export dir not found!\n");
+     if( !chip_xio_start() )
 	return;
-     }
-     if( check_export_pin( XIO_P0 ) == 1 )
-     {
-	printf("Pin %d is in use!\n", XIO_P0);
-	return;
-     }
-     else if( check_export_pin(XIO_P1) == 1)
-     {
-	printf("Pin %d is in use!\n", XIO_P1);
-        return;
-     }
-     else if( check_export_pin(XIO_P2) == 1)
-     {
-	printf("Pin %d is in use!\n", XIO_P2);
-        return;
-     }
-     else if( check_export_pin(XIO_P3) == 1)
-     {
-	printf("Pin %d is in use!\n", XIO_P3);
-        return;
-     }
-     else
-	printf("Pins are not in use!\n");
 
      printf( "export pin XIO_P0\n" );
-     export_pin( XIO_P0 );
+     if( !export_pin( XIO_P0 ) )
+	return;
+
      printf( "export pin XIO_P1\n" );
-     export_pin( XIO_P1 );
+     if( !export_pin( XIO_P1 ) )
+	return;
+
      printf( "export pin XIO_P2\n" );
-     export_pin( XIO_P2 );
+     if( !export_pin( XIO_P2 ) )
+	return;
+
      printf( "export pin XIO_P3\n" );
-     export_pin( XIO_P3 );
+     if( !export_pin( XIO_P3 ) )
+	return;
 
      printf("Checking for direction------------------------------------------\n");
      printf( "XIO_P0 Pin Direction is: %s\n", get_pin_direction( XIO_P0 ));

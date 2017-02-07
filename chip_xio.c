@@ -145,15 +145,14 @@ int check_export_dir( )
 
      if( status == -1  )
      {
-        printf("No directory!\n");
+        printf("Export directory not found!\n");
 	return -1;
      }
      else
      {
-        printf("Directory Found!\n");
+        printf("Export directory found!\n");
 	return 0;
      }
-     
 }
 // Use to check avalability of pin for export.
 // -------------------------------------------
@@ -175,12 +174,12 @@ int check_export_pin( int pin )
 
      if( status == -1  )
      {
-        printf("No directory!\n");
+        printf( "%d pin directory not found!\n", pin );
 	return -1;
      }
      else
      {
-        printf("Directory Found!\n");
+        printf( "%d pin directory Found!\n", pin );
 	return 0;
      }
 }

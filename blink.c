@@ -29,28 +29,12 @@
 void main( void )
 {
      int i;
-     if( geteuid() != 0 )
-     {
-	printf("Run as a sudo user!\n");
-	return;
-     }
-     int count;
-     printf("Checking for export---------------------------------------------\n");
-     if( check_export_dir() == 0 )
-     {
-	printf("Export dir not found!\n");
-	return;
-     }
-     if( check_export_pin( XIO_P4 ) == 1 )
-     {
-	printf("Pin %d is in use!\n", XIO_P4);
-	return;
-     }
-     else
-	printf("Pins are not in use!\n");
+     if( !chip_xio_start() )
+        return;
 
-     printf( "export pin XIO_P0\n" );
-     export_pin( XIO_P4 );
+     if( !export_pin( XIO_P4 ) )
+	return;
+
      printf("Checking for direction------------------------------------------\n");
      printf( "XIO_P4 Pin Direction is: %s\n", get_pin_direction( XIO_P4 ));
 
@@ -64,15 +48,15 @@ void main( void )
         printf( "Pin set for output\n" );
      }
      printf("Run test program------------------------------------------------\n");
-     for( i = 0 ; i < 100; i++ )
+     for( i = 0 ; i < 10; i++ )
      {
-       // printf( "Setting XIO_P4 high\n");
+        printf( "Setting XIO_P4 high\n");
         set_pin_high( XIO_P4 );
-       // printf( "XIO_P4 Pin Value is: %s\n", get_pin_value( XIO_P4 ) );
+        printf( "XIO_P4 Pin Value is: %s\n", get_pin_value( XIO_P4 ) );
         sleep( 1 );
-       // printf("Setting XIO_P4 low\n");
+        printf("Setting XIO_P4 low\n");
         set_pin_low( XIO_P4 );
-       // printf( "XIO_P4 Pin Value is: %s\n", get_pin_value( XIO_P4 ) );
+        printf( "XIO_P4 Pin Value is: %s\n", get_pin_value( XIO_P4 ) );
         sleep( 1 );
       }
       printf( "Unexport pin XIO_P4\n" );
