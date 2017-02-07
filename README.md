@@ -28,3 +28,5 @@ $ sudo ./test_input
 
 Tested single led on output.
 $ sudo ./test_blink
+
+NOTES:  Mind C.H.I.P. input and output voltage levels. 3.3v. Use logic level converter where needed. 
