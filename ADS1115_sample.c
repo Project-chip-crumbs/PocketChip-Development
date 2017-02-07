@@ -1,4 +1,5 @@
-// This software uses the gnuplot_i library written by N. Devillard.
+// ADS1115_sample.c - 12/9/2013. Written by David Purdie as part of the openlabtools initiative
+// Initiates and reads a single sample from the ADS1115 (without error handling)
 
 
 #include <stdio.h>
