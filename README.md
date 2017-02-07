@@ -22,7 +22,9 @@ You can test sample:
 
 Drive Relays on xio pins for output.
 $ sudo ./test_chip_xio
+
 Tested rain sensor on input.
 $ sudo ./test_input
+
 Tested single led on output.
 $ sudo ./test_blink
