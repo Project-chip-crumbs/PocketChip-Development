@@ -1,24 +1,41 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <pthread.h>
 #include "chip_xio.h"
 
-static int button_one,button_two;
+#define RELAY_ONE   XIO_P0
+#define RELAY_TWO   XIO_P1
+#define BUTTON_ONE  XIO_P4
+#define BUTTON_TWO  XIO_P5
 
+
+static int button_one_state;
+
+void *button_one_press( void *arg )
+{
+	int *pin;
+	pin = (int*)arg;
+
+	while( 1 )
+	{
+		if( button_one_state != 0 )
+		   button_one_state = strcmp( get_pin_value( *pin ), "0" );
+	}
+}
 void run_ffcycle(void)
 {
-	button_one = 1;
-	while( button_one != 0 )
+	button_one_state = 1;
+	while( button_one_state != 0 )
 	{
-		set_pin_high(XIO_P0);
-		set_pin_low(XIO_P1);
+		set_pin_high(RELAY_ONE);
+		set_pin_low(RELAY_TWO);
 		sleep(12);
-		set_pin_low(XIO_P0);
-		set_pin_high(XIO_P1);
+		set_pin_low(RELAY_ONE);
+		set_pin_high(RELAY_TWO);
 		sleep(12);
-		button_one = strcmp( get_pin_value(XIO_P4), "0" );
 	}
-	set_pin_high(XIO_P0);
-	set_pin_high(XIO_P1);
+	set_pin_low(RELAY_ONE);
+	set_pin_low(RELAY_TWO);
 }
 
 void main( void ){
@@ -27,65 +44,60 @@ void main( void ){
 	{
 		return;
 	}
-
-	if( !export_pin( XIO_P0 ) )
+	if( !export_pin( RELAY_ONE ) )
 	{
 		return;
 	}
-	else if( !export_pin( XIO_P1 ) )
+	else if( !export_pin( RELAY_TWO ) )
 	{
 		return;
 	}
-	else if( !export_pin( XIO_P4 ) )
+	else if( !export_pin( BUTTON_ONE ) )
 	{
 		return;
 	}
-	else if( !export_pin( XIO_P5 ) )
+	else if( !export_pin( BUTTON_TWO ) )
 	{
 		return;
 	}
-
-	if( strcmp( get_pin_direction( XIO_P0 ), "out" ) != 0 )
-	{
-		set_pin_output( XIO_P0 );
-	}
-	else if( strcmp( get_pin_direction( XIO_P1), "out" ) != 0  )
-	{
-		set_pin_output( XIO_P1);
-	}
-	else if( strcmp( get_pin_direction( XIO_P4), "in" ) != 0 )
-	{
-		set_pin_input( XIO_P4 );
-	}
-	else if( strcmp( get_pin_direction( XIO_P5), "in" ) != 0 )
-	{
-		set_pin_input( XIO_P5 );
-	}
-	printf( "XIO_P0 Direction: %s\n", get_pin_direction( XIO_P0 ) );
-	printf( "XIO_P1 Direction: %s\n", get_pin_direction( XIO_P1 ) );
-	printf( "XIO_P4 Direction: %s\n", get_pin_direction( XIO_P4 ) );
-	printf( "XIO_P5 Direction: %s\n", get_pin_direction( XIO_P5 ) );
+	set_pin_output( RELAY_ONE );
+	set_pin_output( RELAY_TWO);
+	set_pin_input( BUTTON_ONE );
+	set_pin_input( BUTTON_TWO );	
+	
+	printf( "RELAY_ONE Direction: %s\n", get_pin_direction( RELAY_ONE ) );
+	printf( "RELAY_TWO Direction: %s\n", get_pin_direction( RELAY_TWO ) );
+	printf( "BUTTON_ONE Direction: %s\n", get_pin_direction( BUTTON_ONE ) );
+	printf( "BUTTON_TWO Direction: %s\n", get_pin_direction( BUTTON_TWO ) );
 
 	printf("Press button 1 to run/pause fill/flush cycle: \n");
-	button_one = 1;
-	button_two = 1;
-	while( button_two != 0   )
+	printf("Press button 2 to end program!\n");
+
+	pthread_t pth;
+	int button_two_state;
+	int pin = BUTTON_ONE;
+	pthread_create( &pth, NULL, button_one_press, &pin );
+
+	button_one_state = button_two_state = 1;
+
+	while( button_two_state != 0   )
 	{
-		if( button_one == 0 )
+		if( button_one_state == 0 )
 		{
 		   run_ffcycle();
+		   button_one_state = 1;
 		}
 		else
 		{
 		   printf("Paused Fill Flush Cycle\n");
 		}
-		sleep(3);
-		button_two = strcmp( get_pin_value( XIO_P5 ), "0");
-		button_one = strcmp( get_pin_value( XIO_P4 ), "0");
+		sleep(2);
+		button_two = strcmp( get_pin_value( BUTTON_TWO ), "0");	
 	}
-	printf("Unexport pins.\n");
-	unexport_pin(XIO_P5);
-	unexport_pin(XIO_P4);
-	unexport_pin(XIO_P0);
-	unexport_pin(XIO_P1);
+	printf("Stop Thread and Unexport pins.\n");
+	pthread_cancel( pth );
+	unexport_pin(BUTTON_TWO);
+	unexport_pin(BUTTON_ONE);
+	unexport_pin(RELAY_TWO);
+	unexport_pin(RELAY_ONE);
 }
