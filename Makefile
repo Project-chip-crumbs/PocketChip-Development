@@ -11,10 +11,9 @@ OBJ6=xio_thread.o $(OBJ1)
 %.o: %.c $(DEPS)
 	$(CC) -c -o $@ $< $(CFLAGS)
 
-all: test_chip_xio test_input test_blink xio_thread clean
+all: test_chip_xio test_input test_blink ff_cycle xio_thread clean
 
 test_chip_xio: $(OBJ2)
-
 	$(CC) -o $@ $^ $(CFLAGS)
 
 test_input: $(OBJ3)
@@ -24,7 +23,7 @@ test_blink: $(OBJ4)
 	$(CC) -o $@ $^ $(CFLAGS)
 
 ff_cycle: $(OBJ5)
-	$(CC) -o $@ $^ $(CFLAGS)
+	$(CC) -o $@ $^ $(CFLAGS) -lpthread
 
 xio_thread: $(OBJ6)
 	$(CC) -o $@ $^ $(CFLAGS) -lpthread
