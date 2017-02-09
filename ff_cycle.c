@@ -18,8 +18,10 @@ void *button_one_press( void *arg )
 
 	while( 1 )
 	{
-		if( button_one_state != 0 )
+		if( button_one_state != 0 ) 
+		{
 		   button_one_state = strcmp( get_pin_value( *pin ), "0" );
+		}
 	}
 }
 void run_ffcycle(void)
@@ -64,8 +66,10 @@ void main( void ){
 	set_pin_output( RELAY_ONE );
 	set_pin_output( RELAY_TWO);
 	set_pin_input( BUTTON_ONE );
-	set_pin_input( BUTTON_TWO );	
-	
+	set_pin_input( BUTTON_TWO );
+	set_pin_low(RELAY_ONE);
+	set_pin_low(RELAY_TWO);
+
 	printf( "RELAY_ONE Direction: %s\n", get_pin_direction( RELAY_ONE ) );
 	printf( "RELAY_TWO Direction: %s\n", get_pin_direction( RELAY_TWO ) );
 	printf( "BUTTON_ONE Direction: %s\n", get_pin_direction( BUTTON_ONE ) );
@@ -93,7 +97,7 @@ void main( void ){
 		   printf("Paused Fill Flush Cycle\n");
 		}
 		sleep(2);
-		button_two = strcmp( get_pin_value( BUTTON_TWO ), "0");	
+		button_two_state = strcmp( get_pin_value( BUTTON_TWO ), "0");
 	}
 	printf("Stop Thread and Unexport pins.\n");
 	pthread_cancel( pth );
