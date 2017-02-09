@@ -34,6 +34,7 @@ void run_ffcycle(void)
 		set_pin_high(RELAY_TWO);
 		sleep(12);
 	}
+	sleep(2);
 	set_pin_low(RELAY_ONE);
 	set_pin_low(RELAY_TWO);
 }
